@@ -381,7 +381,7 @@ describe Cocoon do
         before do
           @html = @tester.link_to_remove_association('remove something', @form_obj, { wrapper_class: 'another-class' })
         end
-  
+
         it_behaves_like "a correctly rendered remove link", { extra_attributes: { 'data-wrapper-class' => 'another-class' } }
       end
     end
@@ -409,8 +409,10 @@ describe Cocoon do
       expect(comment.post).to be_nil
     end
 
-    it "raises an error if cannot reflect on association" do
-      expect { @tester.create_object(double(:object => Comment.new), :not_existing) }.to raise_error /association/i
+    it "creates an object if cannot reflect on association" do
+      object = double("AnyNonActiveRecordObject")
+      object.should_receive(:build_non_reflectable).and_return 'custom'
+      @tester.create_object(double(:object => object), :non_reflectable).should == 'custom'
     end
 
     it "creates an association if object responds to 'build_association' as singular" do
